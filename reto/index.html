@@ -3,10 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reto MultiTap</title>
-  <meta name="description" content="Te han enviado un mensaje secreto en MultiTap. ¿Puedes descifrarlo?">
-  <meta property="og:title" content="🔐 Reto MultiTap">
-  <meta property="og:description" content="Te han enviado un mensaje secreto escrito como en los teléfonos de 2000. ¿Puedes descifrarlo?">
+  <title>📱 ¡Tienes un mensaje secreto!</title>
+  <meta name="description" content="Escrito como en los teléfonos de antes. Toca para descifrarlo en MultiTap.">
+  <!-- Link preview card (WhatsApp, Telegram…): tells the receiver what the link is and to tap it. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MultiTap">
+  <meta property="og:title" content="📱 ¡Tienes un mensaje secreto!">
+  <meta property="og:description" content="Escrito como en los teléfonos de antes. Toca para descifrarlo en MultiTap.">
+  <meta property="og:image" content="https://hasok.github.io/preview.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta name="twitter:card" content="summary">
   <meta name="theme-color" content="#080B2B">
   <style>
     :root {
@@ -147,22 +154,31 @@
   </main>
 
   <script>
-    // The challenge travels in ?c= as the same JSON the app uses: {"v":1,"c":"44 666 555 2","t":4}
+    // The challenge travels as ?m=44-666-555-2 (short link) or, in older links, as ?c={"v":1,"c":"44 666 555 2","t":4}
     (function () {
-      var raw = new URLSearchParams(location.search).get('c');
-      var data = null;
-      try { data = raw ? JSON.parse(raw) : null; } catch (e) { data = null; }
+      var params = new URLSearchParams(location.search);
+      var code = null;
+      var shortCode = params.get('m');
+      if (shortCode && /^[0-9]+(-[0-9]+)*$/.test(shortCode)) {
+        code = shortCode.split('-').join(' ');
+      } else {
+        try {
+          var data = JSON.parse(params.get('c') || 'null');
+          if (data && data.v === 1 && typeof data.c === 'string') code = data.c;
+        } catch (e) { code = null; }
+      }
 
-      if (!data || data.v !== 1 || typeof data.c !== 'string') {
+      if (!code) {
         document.getElementById('invalid').hidden = false;
         return;
       }
 
       document.getElementById('challenge').hidden = false;
-      document.getElementById('code').textContent = data.c;
-      if (typeof data.t === 'number') document.getElementById('meta').textContent = data.t + ' caracteres';
+      document.getElementById('code').textContent = code;
+      document.getElementById('meta').textContent = code.split(' ').length + ' caracteres';
 
-      var payload = encodeURIComponent(raw);
+      // The app understands the JSON payload in multitap:// links (also in older app versions).
+      var payload = encodeURIComponent(JSON.stringify({ v: 1, c: code }));
       var appUrl = 'multitap://challenge?challenge=' + payload;
       var isAndroid = /Android/i.test(navigator.userAgent);
       // On Android, an intent:// link opens the installed app reliably from Chrome and in-app browsers.
