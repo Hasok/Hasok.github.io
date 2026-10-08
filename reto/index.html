@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reto MultiTap</title>
+  <meta name="description" content="Te han enviado un mensaje secreto en MultiTap. ¿Puedes descifrarlo?">
+  <meta property="og:title" content="🔐 Reto MultiTap">
+  <meta property="og:description" content="Te han enviado un mensaje secreto escrito como en los teléfonos de 2000. ¿Puedes descifrarlo?">
+  <meta name="theme-color" content="#080B2B">
+  <style>
+    :root {
+      --bg: #080b2b;
+      --panel: #121a44;
+      --border: #2a3a78;
+      --text: #f5ead8;
+      --muted: #a9b4d6;
+      --accent: #ff4f83;
+      --accent2: #b67cff;
+      --lcd: #b9c99b;
+      --lcd-ink: #1c2a16;
+      --lcd-dim: #6f805a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px 40px;
+    }
+    main { width: 100%; max-width: 420px; }
+    header { text-align: center; margin-bottom: 22px; }
+    .logo { font-size: 28px; font-weight: 900; letter-spacing: 3px; margin: 0; }
+    .tag { color: var(--accent2); font-size: 11px; letter-spacing: 3px; margin-top: 4px; }
+
+    .phone {
+      background: #1f3366;
+      border: 3px solid #0d1838;
+      border-radius: 64px 64px 44px 44px;
+      padding: 14px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
+    }
+    .face {
+      background: #c3c8cf;
+      border: 2px solid #848a95;
+      border-radius: 54px 54px 28px 28px;
+      padding: 22px 18px 18px;
+    }
+    .earpiece { width: 64px; height: 7px; border-radius: 4px; background: #2a303c; margin: 0 auto 8px; }
+    .brand { text-align: center; color: #4b5160; font-size: 10px; font-weight: 900; letter-spacing: 3px; margin-bottom: 10px; }
+    .bezel { background: #2a303c; border-radius: 16px; padding: 9px 9px 13px; }
+    .lcd {
+      background: var(--lcd);
+      color: var(--lcd-ink);
+      border-radius: 5px;
+      padding: 8px 10px 10px;
+      font-family: ui-monospace, "Roboto Mono", Menlo, Consolas, monospace;
+    }
+    .status { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; }
+    .rule { height: 1px; background: var(--lcd-dim); margin: 6px 0 10px; }
+    .envelope {
+      width: 54px; height: 36px; margin: 6px auto 10px; position: relative;
+      border: 3px solid var(--lcd-ink); overflow: hidden;
+      animation: blink 1.1s steps(2, start) infinite;
+    }
+    .envelope::before, .envelope::after {
+      content: ""; position: absolute; top: 0; width: 36px; height: 3px; background: var(--lcd-ink);
+    }
+    .envelope::before { left: -2px; transform-origin: left top; transform: rotate(36deg); }
+    .envelope::after { right: -2px; transform-origin: right top; transform: rotate(-36deg); }
+    @keyframes blink { to { visibility: hidden; } }
+    .lcd-title { text-align: center; font-weight: 900; font-size: 13px; }
+    .code { font-size: 20px; line-height: 1.4; word-spacing: 4px; margin: 10px 0 4px; word-break: break-word; }
+    .meta { font-size: 11px; color: var(--lcd-dim); font-weight: 700; }
+
+    .button {
+      display: block; width: 100%; margin-top: 22px; padding: 17px; border: 0; border-radius: 30px;
+      background: var(--accent); color: #fff; font-size: 15px; font-weight: 900; letter-spacing: 1px;
+      text-align: center; text-decoration: none;
+    }
+    .card { margin-top: 18px; padding: 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border); }
+    .card h2 { font-size: 13px; letter-spacing: 1.5px; color: var(--accent2); margin: 0 0 8px; }
+    .card p { color: var(--muted); font-size: 14px; line-height: 1.5; margin: 0 0 10px; }
+    .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .key { background: #1f2a5c; border-radius: 10px; padding: 7px 4px; text-align: center; }
+    .key b { display: block; font-size: 16px; }
+    .key span { font-size: 11px; color: var(--muted); }
+    .error { text-align: center; color: var(--muted); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="logo">MULTITAP</p>
+      <div class="tag">MENSAJES SECRETOS DE OTRA ÉPOCA</div>
+    </header>
+
+    <section id="challenge" hidden>
+      <div class="phone">
+        <div class="face">
+          <div class="earpiece"></div>
+          <div class="brand">MULTITAP</div>
+          <div class="bezel">
+            <div class="lcd">
+              <div class="status"><span>▮▮▮</span><span>1 MENSAJE NUEVO</span><span>▰</span></div>
+              <div class="rule"></div>
+              <div class="envelope" aria-hidden="true"></div>
+              <div class="lcd-title">TE HAN ENVIADO UN RETO</div>
+              <div class="code" id="code"></div>
+              <div class="meta" id="meta"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a class="button" id="open" href="#">ABRIR EN MULTITAP</a>
+
+      <div class="card">
+        <h2>¿AÚN NO TIENES MULTITAP?</h2>
+        <p>La app está en pruebas: pide el APK a quien te envió el reto. Mientras tanto puedes descifrarlo a mano, como se escribía en los teléfonos de antes: cada grupo de números es una letra y el número de pulsaciones indica cuál.</p>
+        <div class="keys">
+          <div class="key"><b>1</b><span>. , ? ! ¿ ¡</span></div>
+          <div class="key"><b>2</b><span>A B C</span></div>
+          <div class="key"><b>3</b><span>D E F</span></div>
+          <div class="key"><b>4</b><span>G H I</span></div>
+          <div class="key"><b>5</b><span>J K L</span></div>
+          <div class="key"><b>6</b><span>M N O</span></div>
+          <div class="key"><b>7</b><span>P Q R S</span></div>
+          <div class="key"><b>8</b><span>T U V</span></div>
+          <div class="key"><b>9</b><span>W X Y Z</span></div>
+          <div class="key"><b>*</b><span>—</span></div>
+          <div class="key"><b>0</b><span>espacio</span></div>
+          <div class="key"><b>#</b><span>—</span></div>
+        </div>
+        <p style="margin: 10px 0 0">Ejemplo: <b>44 666 555 2</b> = HOLA</p>
+      </div>
+    </section>
+
+    <section id="invalid" class="card error" hidden>
+      <p>Este enlace no contiene un reto válido.</p>
+    </section>
+  </main>
+
+  <script>
+    // The challenge travels in ?c= as the same JSON the app uses: {"v":1,"c":"44 666 555 2","t":4}
+    (function () {
+      var raw = new URLSearchParams(location.search).get('c');
+      var data = null;
+      try { data = raw ? JSON.parse(raw) : null; } catch (e) { data = null; }
+
+      if (!data || data.v !== 1 || typeof data.c !== 'string') {
+        document.getElementById('invalid').hidden = false;
+        return;
+      }
+
+      document.getElementById('challenge').hidden = false;
+      document.getElementById('code').textContent = data.c;
+      if (typeof data.t === 'number') document.getElementById('meta').textContent = data.t + ' caracteres';
+
+      var payload = encodeURIComponent(raw);
+      var appUrl = 'multitap://challenge?challenge=' + payload;
+      var isAndroid = /Android/i.test(navigator.userAgent);
+      // On Android, an intent:// link opens the installed app reliably from Chrome and in-app browsers.
+      document.getElementById('open').href = isAndroid
+        ? 'intent://challenge?challenge=' + payload + '#Intent;scheme=multitap;package=com.alejandrovolcan.multitap;end'
+        : appUrl;
+    })();
+  </script>
+</body>
+</html>
