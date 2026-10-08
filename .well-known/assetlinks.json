@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.alejandrovolcan.multitap",
+      "sha256_cert_fingerprints": [
+        "3E:FD:E2:94:D2:51:F2:62:31:DC:ED:60:84:AF:F1:94:C1:B4:1C:92:73:63:30:F2:C5:89:B0:12:73:FC:4C:65"
+      ]
+    }
+  }
+]
